@@ -10,23 +10,23 @@ var distance_units = ["km", "miles"];
 function unit(units){
     return {"type": "string", "enum": units};
 }
-function simple_value_no_units() {
-    var config = simple_value();
+function simple_value_no_units(sectors) {
+    var config = simple_value(sectors);
     delete config["required"].splice(1);
     delete config["properties"]["unit"];
     return config;
 }
-function simple_value_no_units_no_decimals() {
-    var config = simple_value_no_units();
+function simple_value_no_units_no_decimals(sectors) {
+    var config = simple_value_no_units(sectors);
     delete config["properties"]["decimals"];
     return config;
 }
-function simple_value_no_decimals(units) {
-    var config = simple_value(units);
+function simple_value_no_decimals(sectors, units) {
+    var config = simple_value(units, sectors);
     delete config["properties"]["decimals"];
     return config;
 }
-function simple_value(units) {
+function simple_value(sectors, units) {
    return {
        "type": "object",
        "required": ["tag", "unit"],
@@ -39,7 +39,7 @@ function simple_value(units) {
            "max": max,
            "sectors": sectors
         }
-    }
+    };
 }
 
 /* fields */
@@ -84,6 +84,27 @@ var sectors = {
         }
     }
 };
+
+var sectors_decimals = {
+    "type": "array",
+    "format": "table",
+    "items": {
+        "type":"object",
+        "properties": {
+            "lo": {
+                "type": "number"
+            },
+            "hi": {
+                "type": "number"
+            },
+            "color": {
+                "type": "string",
+                "format": "color"
+            }
+        }
+    }
+};
+
 var odo = {
     "type": "object",
     "required": ["tag", "unit"],
@@ -138,6 +159,19 @@ var template = {
         "href": "templates/{{self}}.png"}
         ]
 };
+var map = {
+    "type": "object",
+    "required": ["tag", "unit"],
+    "properties": {
+        "tag": tag,
+        "unit": unit(pressure_units),
+        "decimals": decimals,
+        "label": label,
+        "suffix": suffix,
+        "max": max,
+        "sectors": sectors_decimals
+    }
+};
 var label = {"type": "string"};
 var max = {"type": "integer"};
 var decimals = {"type": "integer"};
@@ -153,7 +187,7 @@ var analog = {
         "label": label,
         "suffix": suffix,
         "max": max,
-        "sectors": sectors
+        "sectors": sectors_decimals
     }
 };
 
@@ -171,15 +205,15 @@ var schema = {
             "rpm": rpm,
             "mil": mil,
             "fan": fan,
-            "eth": simple_value_no_units_no_decimals(),
-            "vss": simple_value_no_decimals(speed_units),
-            "cam": simple_value_no_units_no_decimals(),
-            "bat": simple_value_no_units(),
-            "tps": simple_value_no_units_no_decimals(),
-            "iat": simple_value_no_decimals(temp_units),
-            "ect": simple_value_no_decimals(temp_units),
-            "o2": simple_value(mixture_units),
-            "map": simple_value(pressure_units),
+            "eth": simple_value_no_units_no_decimals(sectors),
+            "vss": simple_value_no_decimals(speed_units, sectors),
+            "cam": simple_value_no_units_no_decimals(sectors),
+            "bat": simple_value_no_units(sectors_decimals),
+            "tps": simple_value_no_units_no_decimals(sectors),
+            "iat": simple_value_no_decimals(temp_units, sectors),
+            "ect": simple_value_no_decimals(temp_units, sectors),
+            "o2": simple_value(sectors_decimals, mixture_units),
+            "map": map,
             "an0": analog,
             "an1": analog,
             "an2": analog,
