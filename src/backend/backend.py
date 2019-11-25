@@ -9,30 +9,41 @@ from devices.style import Style
 from devices.time import Time
 from version import __version__
 
-
 @register(u"setup")
 def setup():
+    """
+    Remote procedure call to get the project setup
+    """
     return setup_file.load_setup()
 
 
 @register(u"save")
 def save(new_setup):
+    """
+    Remote procedure call to save a new project setup
+    """
     setup_file.save_setup(new_setup)
     setup_file.rotate_screen(new_setup["screen"]["rotate"])
 
 
 @register(u"reset")
 def reset():
+    """
+    Remote procedure call to reset the project setup to the default one
+    """
     setup_file.reset_setup()
 
 
-while True:
-    try:
-        run()
-        break
-    except Exception:
-        continue
+def start_websocket():
+    while True:
+        try:
+            run()
+            break
+        except ConnectionRefusedError:
+            continue  # don't give up mate, we have to start this thing no matter how
 
+
+start_websocket()
 time = Time()
 setup_file = SetupFile()
 odo = Odometer()
