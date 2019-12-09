@@ -26,6 +26,12 @@ connection.onopen = function(session) {
     }
   }
 
+  // register a function for refreshing the frontend from the backend
+  function refresh(args){
+    console.log('refreshhh');
+    location.reload();
+  }
+
   session.call("setup").then(
     function(res) {
       setup = res;
@@ -47,6 +53,7 @@ connection.onopen = function(session) {
   );
 
   session.subscribe("data", onevent1);
+  session.subscribe("refresh", refresh);
 };
 
 connection.open();

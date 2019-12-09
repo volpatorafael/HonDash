@@ -1,6 +1,6 @@
 from time import sleep
 
-from autobahn_sync import publish, register, run
+from autobahn_sync import publish, register, run, call
 
 from devices.kpro.kpro import Kpro
 from devices.odometer import Odometer
@@ -19,6 +19,7 @@ def setup():
 def save(new_setup):
     setup_file.save_setup(new_setup)
     setup_file.rotate_screen(new_setup["screen"]["rotate"])
+    publish("refresh", None)
 
 
 @register(u"reset")
